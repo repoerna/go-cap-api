@@ -1,0 +1,24 @@
+package app
+
+import (
+	"net/http"
+
+	"github.com/gorilla/mux"
+)
+
+func Start() {
+
+	mux := mux.NewRouter()
+
+	// * defining routes
+	mux.HandleFunc("/greet", greet).Methods(http.MethodGet)
+	mux.HandleFunc("/customers", getCustomers).Methods(http.MethodGet)
+	mux.HandleFunc("/customers", addCustomers).Methods(http.MethodPost)
+
+	mux.HandleFunc("/customers/{customer_id:[0-9]+}", getCustomerById).Methods(http.MethodGet)
+	mux.HandleFunc("/customers/{customer_id:[0-9]+}", updateCustomer).Methods(http.MethodPut)
+	mux.HandleFunc("/customers/{customer_id:[0-9]+}", deleteCustomer).Methods(http.MethodDelete)
+
+	// * starting the server
+	http.ListenAndServe(":8080", mux)
+}
