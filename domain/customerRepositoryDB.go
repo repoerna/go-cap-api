@@ -21,11 +21,19 @@ func NewCustomerRepositoryDB() CustomerRepositoryDB {
 	return CustomerRepositoryDB{db}
 }
 
-func (s CustomerRepositoryDB) FindAll() ([]Customer, *errs.AppError) {
+func (s CustomerRepositoryDB) FindAll(status string) ([]Customer, *errs.AppError) {
 
-	query := "select * from customers"
+	var query string
+	var rows *sql.Rows
+	var err error
 
-	rows, err := s.db.Query(query)
+	if status == "" {
+		query = "select * from customers"
+		rows, err = s.db.Query(query)
+	} else {
+		query = "select * from customers where status = $1"
+		rows, err = s.db.Query(query, status)
+	}
 
 	if err != nil {
 		log.Println("error fetch data to customer table ", err.Error())
