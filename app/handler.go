@@ -118,8 +118,11 @@ func deleteCustomer(w http.ResponseWriter, r *http.Request) {
 
 	for index, cust := range customers {
 		if cust.ID == id {
-			customers = append(customers[:index], customers[index+1:]...)
-			break
+			// customers = append(customers[:index], customers[index+1:]...)
+			// break
+			customers[index] = customers[len(customers)-1]
+            customers[len(customers)-1] = Customer{}
+            customers = customers[:len(customers)-1]
 		}
 	}
 
