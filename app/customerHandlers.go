@@ -3,7 +3,6 @@ package app
 import (
 	"capi/service"
 	"encoding/json"
-	"encoding/xml"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -15,15 +14,14 @@ type CustomerHandlers struct {
 
 func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Request) {
 
-	customers, _ := ch.service.GetAllCustomer()
+	customers, err := ch.service.GetAllCustomer()
 
-	if r.Header.Get("Content-Type") == "application/xml" {
-		w.Header().Add("Content-Type", "application/xml")
-		xml.NewEncoder(w).Encode(customers)
-	} else {
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(customers)
+	if err != nil {
+		writeResponse(w, err.Code, err.AsMessage())
+		return
 	}
+
+	writeResponse(w, http.StatusOK, customers)
 
 }
 
@@ -34,15 +32,10 @@ func (ch *CustomerHandlers) getCustomerByID(w http.ResponseWriter, r *http.Reque
 
 	customer, err := ch.service.GetCustomerByID(customerID)
 	if err != nil {
-		// w.WriteHeader(err.Code)
-		// w.Header().Add("Content-Type", "application/json")
-		// json.NewEncoder(w).Encode(err.AsMessage())
 		writeResponse(w, err.Code, err.AsMessage())
 		return
 	}
 
-	// w.Header().Add("Content-Type", "application/json")
-	// json.NewEncoder(w).Encode(customer)
 	writeResponse(w, http.StatusOK, customer)
 }
 

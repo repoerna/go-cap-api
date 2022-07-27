@@ -21,7 +21,7 @@ func NewCustomerRepositoryDB() CustomerRepositoryDB {
 	return CustomerRepositoryDB{db}
 }
 
-func (s CustomerRepositoryDB) FindAll() ([]Customer, error) {
+func (s CustomerRepositoryDB) FindAll() ([]Customer, *errs.AppError) {
 
 	query := "select * from customers"
 
@@ -29,7 +29,7 @@ func (s CustomerRepositoryDB) FindAll() ([]Customer, error) {
 
 	if err != nil {
 		log.Println("error fetch data to customer table ", err.Error())
-		return nil, err
+		return nil, errs.NewUnexpectedError("unexpected database error")
 	}
 
 	var customers []Customer
@@ -39,7 +39,7 @@ func (s CustomerRepositoryDB) FindAll() ([]Customer, error) {
 		err := rows.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.ZipCode, &c.Status)
 		if err != nil {
 			log.Println("error scanning customer data ", err.Error())
-			return nil, err
+			return nil, errs.NewUnexpectedError("unexpected database error")
 		}
 
 		customers = append(customers, c)
