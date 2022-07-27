@@ -1,6 +1,9 @@
 package domain
 
-import "capi/errs"
+import (
+	"capi/dto"
+	"capi/errs"
+)
 
 type Customer struct {
 	ID          string `db:"customer_id"`
@@ -15,4 +18,23 @@ type CustomerRepository interface {
 	//  status -> "1", "0", ""
 	FindAll(string) ([]Customer, *errs.AppError)
 	FindByID(string) (*Customer, *errs.AppError)
+}
+
+func (c Customer) convertStatusName() string {
+	statusName := "active"
+	if c.Status == "0" {
+		statusName = "inactive"
+	}
+	return statusName
+}
+
+func (c Customer) ToDTO() dto.CustomerResponse {
+	return dto.CustomerResponse{
+		ID:          c.ID,
+		Name:        c.Name,
+		DateOfBirth: c.DateOfBirth,
+		City:        c.City,
+		ZipCode:     c.ZipCode,
+		Status:      c.convertStatusName(),
+	}
 }
