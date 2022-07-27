@@ -13,6 +13,9 @@ type DefaultCustomerService struct {
 }
 
 func (s DefaultCustomerService) GetAllCustomer() ([]domain.Customer, error){
+	// add proses here 
+
+	
 	return s.repository.FindAll()
 }
 

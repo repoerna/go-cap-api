@@ -11,7 +11,7 @@ import (
 func Start() {
 
 	// wiring
-	ch := CustomerHendler{service.NewCustomerService(domain.NewCustomerRepositoryStub())}
+	ch := CustomerHendler{service.NewCustomerService(domain.NewCustomerRepositoryDB())}
 
 	//create mux
 	mux := mux.NewRouter()

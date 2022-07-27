@@ -5,7 +5,7 @@ type CustomerRepositoryStub struct {
 }
 
 func (s CustomerRepositoryStub) FindAll() ([]Customer, error) {
-	return s.repository, nil
+	return s.Customer, nil
 }
 
 func NewCustomerRepositoryStub() CustomerRepositoryStub {
