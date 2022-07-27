@@ -8,23 +8,39 @@ import (
 )
 
 type CustomerRepositoryDB struct{
+	client *sql.DB
 }
 
 func NewCustomerRepositoryDB()CustomerRepositoryDB{
-	return CustomerRepositoryDB{}
-}
-
-func (d CustomerRepositoryDB) FindAll()([]Customer, error){
 	// connStr := "user=pqgotest dbname=pqgotest sslmode=verify-full"
 	connStr := "postgres://postgres:fitri123@localhost/banking?sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
+	return CustomerRepositoryDB{db}
+}
+
+func (d CustomerRepositoryDB) FindByID(customerID string)(*Customer, error){
+	query := "select * from customers where customer_id = $1"
+
+	row := d.client.QueryRow(query, customerID)
+
+	var c Customer
+		err := row.Scan(&c.ID, &c.Name,&c.DateOfBirth, &c.City, &c.ZipCode, &c.ZipCode)
+		if err!= nil{
+			log.Println("error scanning customer data", err.Error())
+			return nil, err
+		}
+		return &c, nil
+}
+
+
+func (d CustomerRepositoryDB) FindAll()([]Customer, error){
 
 	query := "select * from customers"
 
-	rows, err := db.Query(query)
+	rows, err := d.client.Query(query)
 	if err != nil {
 		log.Println("error query data to customer table", err.Error())
 		return nil, err
@@ -37,6 +53,7 @@ func (d CustomerRepositoryDB) FindAll()([]Customer, error){
 		err := rows.Scan(&c.ID, &c.Name,&c.DateOfBirth, &c.City, &c.ZipCode, &c.ZipCode)
 		if err!= nil{
 			log.Println("error scanning customer data", err.Error())
+			return nil, err
 		}
 
 		customers = append(customers, c)

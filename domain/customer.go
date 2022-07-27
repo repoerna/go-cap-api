@@ -13,5 +13,5 @@ type Customer struct {
 //I untuk interface didepan nama
 type CustomerRepository interface {
 	FindAll() ([]Customer, error)
+	FindByID(string) (*Customer, error)
 }
-
