@@ -93,3 +93,64 @@ func getNextID() int {
 
 	return cust.ID + 1
 }
+
+// update customer
+func updateCustomer(w http.ResponseWriter, r * http.Request){
+	vars := mux.Vars(r)
+	customerId := vars["customer_id"]
+	id, err := strconv.Atoi(customerId)
+	if err != nil{
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "invalid customer id")
+		return
+	}
+
+	var cust Customer
+
+	for customerIndex, data := range customers{
+		if data.ID == id{
+			cust = data
+
+			var newCust Customer
+			json.NewDecoder(r.Body).Decode(&newCust)
+
+			customers[customerIndex].Name = newCust.Name
+			customers[customerIndex].City = newCust.City
+			customers[customerIndex].ZipCode = newCust.ZipCode
+
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, "customer data updated")
+			return
+		}
+	}
+	if cust.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		fmt.Fprint(w, "customer data not found")
+		return
+	}
+	}
+
+
+//delete customer
+func deleteCustomer(w http.ResponseWriter, r * http.Request){
+	vars := mux.Vars(r)
+	customerId := vars["customer_id"]
+	id, err := strconv.Atoi(customerId)
+	if err != nil{
+		w.WriteHeader(http.StatusBadRequest)
+		fmt.Fprint(w, "invalid customer id")
+		return
+	}	
+
+	for customerIndex, data := range customers{
+		if data.ID == id {
+			var newCust Customer
+			json.NewDecoder(r.Body).Decode(&newCust)
+			customers = append(customers[:customerIndex], customers[customerIndex+1:]...)
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprintln(w, "customer data deleted")
+			return
+		}
+	}
+
+}
