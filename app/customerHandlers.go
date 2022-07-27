@@ -4,7 +4,6 @@ import (
 	"capi/service"
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -13,21 +12,6 @@ import (
 type CustomerHandlers struct {
 	service service.CustomerService
 }
-
-// type Customer struct {
-// 	Name    string `json:"name" xml:"name"`
-// 	City    string `json:"city" xml:"city"`
-// 	Zipcode string `json:"zip_code" xml:"zipcode"`
-// }
-
-// var customers []Customer = []Customer{
-// 	{"User 1", "Jakarta", "12345"},
-// 	{"User 2", "Surabaya", "67890"},
-// }
-
-// func greet(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Fprint(w, "Hello Celerates!")
-// }
 
 func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Request) {
 
@@ -48,24 +32,24 @@ func (ch *CustomerHandlers) getCustomerByID(w http.ResponseWriter, r *http.Reque
 
 	customerID := vars["customer_id"]
 
-	// id, err := strconv.Atoi(customerId)
-	// if err != nil {
-	// 	w.WriteHeader(http.StatusBadRequest)
-	// }
-
-	// if len(customers) < id || id == 0 {
-	// 	w.WriteHeader(http.StatusNotFound)
-	// 	json.NewEncoder(w).Encode("customer id not found")
-	// 	return
-	// }
-
 	customer, err := ch.service.GetCustomerByID(customerID)
 	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		fmt.Fprint(w, err.Error())
+		// w.WriteHeader(err.Code)
+		// w.Header().Add("Content-Type", "application/json")
+		// json.NewEncoder(w).Encode(err.AsMessage())
+		writeResponse(w, err.Code, err.AsMessage())
 		return
 	}
 
+	// w.Header().Add("Content-Type", "application/json")
+	// json.NewEncoder(w).Encode(customer)
+	writeResponse(w, http.StatusOK, customer)
+}
+
+func writeResponse(w http.ResponseWriter, code int, data interface{}) {
+	w.WriteHeader(code)
 	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(customer)
+	if err := json.NewEncoder(w).Encode(data); err != nil {
+		panic(err)
+	}
 }

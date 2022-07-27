@@ -1,6 +1,7 @@
 package domain
 
 import (
+	"capi/errs"
 	"database/sql"
 	"log"
 
@@ -21,12 +22,6 @@ func NewCustomerRepositoryDB() CustomerRepositoryDB {
 }
 
 func (s CustomerRepositoryDB) FindAll() ([]Customer, error) {
-	// connStr := "user=postgres dbname=banking sslmode=disable"
-	// connStr := "postgres://postgres:postgres@localhost/banking?sslmode=disable"
-	// db, err := sql.Open("postgres", connStr)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
 
 	query := "select * from customers"
 
@@ -54,7 +49,7 @@ func (s CustomerRepositoryDB) FindAll() ([]Customer, error) {
 
 }
 
-func (s CustomerRepositoryDB) FindByID(id string) (*Customer, error) {
+func (s CustomerRepositoryDB) FindByID(id string) (*Customer, *errs.AppError) {
 
 	query := "select * from customers where customer_id = $1"
 
@@ -63,8 +58,13 @@ func (s CustomerRepositoryDB) FindByID(id string) (*Customer, error) {
 
 	err := row.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.ZipCode, &c.Status)
 	if err != nil {
-		log.Println("error scanning customer data ", err.Error())
-		return nil, err
+		if err == sql.ErrNoRows {
+			return nil, errs.NewNotFoundError("customer not found")
+		} else {
+			log.Println("error scanning customer data ", err.Error())
+			return nil, errs.NewUnexpectedError("unexpected database error")
+		}
+
 	}
 
 	return &c, nil

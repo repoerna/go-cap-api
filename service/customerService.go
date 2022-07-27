@@ -1,10 +1,13 @@
 package service
 
-import "capi/domain"
+import (
+	"capi/domain"
+	"capi/errs"
+)
 
 type CustomerService interface {
 	GetAllCustomer() ([]domain.Customer, error)
-	GetCustomerByID(string) (*domain.Customer, error)
+	GetCustomerByID(string) (*domain.Customer, *errs.AppError)
 }
 
 type DefaultCustomerService struct {
@@ -15,7 +18,7 @@ func (s DefaultCustomerService) GetAllCustomer() ([]domain.Customer, error) {
 	return s.repo.FindAll()
 }
 
-func (s DefaultCustomerService) GetCustomerByID(customerID string) (*domain.Customer, error) {
+func (s DefaultCustomerService) GetCustomerByID(customerID string) (*domain.Customer, *errs.AppError) {
 	return s.repo.FindByID(customerID)
 }
 
