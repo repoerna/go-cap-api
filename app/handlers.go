@@ -1,31 +1,34 @@
 package app
 
 import (
+	"capi/service"
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"net/http"
-	"strconv"
-
-	"github.com/gorilla/mux"
 )
 
-type Customer struct {
-	Name    string `json:"name" xml:"name"`
-	City    string `json:"city" xml:"city"`
-	Zipcode string `json:"zip_code" xml:"zipcode"`
+type CustomerHandlers struct {
+	service service.CustomerService
 }
 
-var customers []Customer = []Customer{
-	{"User 1", "Jakarta", "12345"},
-	{"User 2", "Surabaya", "67890"},
-}
+// type Customer struct {
+// 	Name    string `json:"name" xml:"name"`
+// 	City    string `json:"city" xml:"city"`
+// 	Zipcode string `json:"zip_code" xml:"zipcode"`
+// }
 
-func greet(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "Hello Celerates!")
-}
+// var customers []Customer = []Customer{
+// 	{"User 1", "Jakarta", "12345"},
+// 	{"User 2", "Surabaya", "67890"},
+// }
 
-func getAllCustomers(w http.ResponseWriter, r *http.Request) {
+// func greet(w http.ResponseWriter, r *http.Request) {
+// 	fmt.Fprint(w, "Hello Celerates!")
+// }
+
+func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Request) {
+
+	customers, _ := ch.service.GetAllCustomer()
 
 	if r.Header.Get("Content-Type") == "application/xml" {
 		w.Header().Add("Content-Type", "application/xml")
@@ -37,24 +40,24 @@ func getAllCustomers(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func getCustomer(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+// func getCustomer(w http.ResponseWriter, r *http.Request) {
+// 	vars := mux.Vars(r)
 
-	customerId := vars["customer_id"]
+// 	customerId := vars["customer_id"]
 
-	id, err := strconv.Atoi(customerId)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-	}
+// 	id, err := strconv.Atoi(customerId)
+// 	if err != nil {
+// 		w.WriteHeader(http.StatusBadRequest)
+// 	}
 
-	if len(customers) < id || id == 0 {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode("customer id not found")
-		return
-	}
+// 	if len(customers) < id || id == 0 {
+// 		w.WriteHeader(http.StatusNotFound)
+// 		json.NewEncoder(w).Encode("customer id not found")
+// 		return
+// 	}
 
-	customerData := customers[id-1]
+// 	customerData := customers[id-1]
 
-	w.Header().Add("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(customerData)
-}
+// 	w.Header().Add("Content-Type", "application/json")
+// 	json.NewEncoder(w).Encode(customerData)
+// }
