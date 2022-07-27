@@ -22,6 +22,11 @@
 - [x] Request Header
 - [x] Refactoring and Go Modules
 - [x] Creating our own servemux/router
+- [x] Using Gorilla Mux 
+- [ ] Handle HTTP Method 
+- [ ] JSON Unmarshaling
+
 
 # Learning Material
 - [Go Convetion](https://github.com/golang/go/wiki/CodeReviewComments#variable-names)
+- [JSON Marshal-Unmarshal vs Decode-Encode](https://stackoverflow.com/questions/21197239/decoding-json-using-json-unmarshal-vs-json-newdecoder-decode)
