@@ -2,14 +2,36 @@ package app
 
 import (
 	"capi/domain"
+	"capi/logger"
 	"capi/service"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 )
 
+func sanityCheck() {
+	envProps := []string{
+		"SERVER_ADDRESS",
+		"SERVER_PORT",
+		"DB_USER",
+		"DB_PASSWD",
+		"DB_ADDR",
+		"DB_PORT",
+		"DB_NAME",
+	}
+	for _, k := range envProps {
+		if os.Getenv(k) == "" {
+			logger.Fatal(fmt.Sprintf("environment variable %s not defined. terminating application...", k))
+		}
+	}
+}
+
 func Start() {
+
+	sanityCheck()
 
 	// * create multiplexer
 	router := mux.NewRouter()
@@ -26,9 +48,8 @@ func Start() {
 	router.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomerByID).Methods(http.MethodGet)
 
 	// * starting the server
-	log.Fatal(http.ListenAndServe(":8080", router))
-}
+	address := os.Getenv("SERVER_ADDRESS")
+	port := os.Getenv("SERVER_PORT")
 
-// func createCustomer(w http.ResponseWriter, r *http.Request) {
-// 	fmt.Fprint(w, "post request received")
-// }
+	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", address, port), router))
+}

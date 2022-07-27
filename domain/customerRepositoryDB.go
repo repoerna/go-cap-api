@@ -4,7 +4,9 @@ import (
 	"capi/errs"
 	"capi/logger"
 	"database/sql"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -15,7 +17,13 @@ type CustomerRepositoryDB struct {
 }
 
 func NewCustomerRepositoryDB() CustomerRepositoryDB {
-	connStr := "postgres://postgres:postgres@localhost/banking?sslmode=disable"
+	dbUser := os.Getenv("DB_USER")
+	dbPasswd := os.Getenv("DB_PASSWD")
+	dbAddr := os.Getenv("DB_ADDRESS")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", dbUser, dbPasswd, dbAddr, dbPort, dbName)
 	db, err := sqlx.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
