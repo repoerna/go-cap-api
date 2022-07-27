@@ -44,11 +44,29 @@ func (s CustomerRepositoryDB) FindAll() ([]Customer, error) {
 		err := rows.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.ZipCode, &c.Status)
 		if err != nil {
 			log.Println("error scanning customer data ", err.Error())
+			return nil, err
 		}
 
 		customers = append(customers, c)
 	}
 
 	return customers, nil
+
+}
+
+func (s CustomerRepositoryDB) FindByID(id string) (*Customer, error) {
+
+	query := "select * from customers where customer_id = $1"
+
+	row := s.db.QueryRow(query, id)
+	var c Customer
+
+	err := row.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.ZipCode, &c.Status)
+	if err != nil {
+		log.Println("error scanning customer data ", err.Error())
+		return nil, err
+	}
+
+	return &c, nil
 
 }
