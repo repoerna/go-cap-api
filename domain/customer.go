@@ -1,5 +1,7 @@
 package domain
 
+import "capi/errs"
+
 type Customer struct {
 	//`` berfungsi untuk penamaan dalam json di postman
 	ID          string `json:"id" xml:"id"`
@@ -13,5 +15,5 @@ type Customer struct {
 //I untuk interface didepan nama
 type CustomerRepository interface {
 	FindAll() ([]Customer, error)
-	FindByID(string) (*Customer, error)
+	FindByID(string) (*Customer, *errs.AppErr)
 }
