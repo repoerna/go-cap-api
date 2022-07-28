@@ -18,7 +18,7 @@ func Start() {
 
 	mux.HandleFunc("/customers", ch.getAllCustomers).Methods("GET")
 
-	mux.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomerByID).Methods(http.MethodGet)
+	mux.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomerByID).Methods("GET")
 
 	// * starting the server
 	fmt.Println("starting the server localhost:9000")

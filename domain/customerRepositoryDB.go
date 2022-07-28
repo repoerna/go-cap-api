@@ -1,6 +1,8 @@
 package domain
 
 import (
+	"capi/errs"
+	"capi/logger"
 	"database/sql"
 	"log"
 
@@ -21,16 +23,21 @@ func NewCustomerRepositoryDB() CustomerRepositoryDB {
 	return CustomerRepositoryDB{db}
 }
 
-func (d CustomerRepositoryDB) FindByID(customerID string) (*Customer, error) {
-	query := "select *from customer where customer id = $1"
+func (d CustomerRepositoryDB) FindByID(customerID string) (*Customer, *errs.AppErr) {
+	query := "select * from customers where customer_id = $1"
 
 	row := d.client.QueryRow(query, customerID)
 
 	var c Customer
 	err := row.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.ZipCode, &c.Status)
 	if err != nil {
-		log.Println("error scanning customer data ", err.Error())
-		return nil, err
+		if err == sql.ErrNoRows {
+			logger.Error("error customer data not found "+ err.Error())
+			return nil, errs.NewNotFoundError("Customer Not Found")
+		} else {
+			logger.Error("error scanning data " + err.Error())
+			return nil, errs.NewUnexpectedError("Unexpected Database Error")
+		}
 	}
 
 	return &c, nil
