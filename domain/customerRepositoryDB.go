@@ -25,14 +25,12 @@ func NewCustomerRepositoryDB()CustomerRepositoryDB{
 	return CustomerRepositoryDB{db}
 }
 
+
 func (d CustomerRepositoryDB) FindByID(customerID string)(*Customer, *errs.AppErr){
 	query := "select * from customers where customer_id = $1"
-
 	// row := d.client.QueryRow(query, customerID)
 	// err := row.Scan(&c.ID, &c.Name,&c.DateOfBirth, &c.City, &c.ZipCode, &c.Status)
-
 	var c Customer
-
 	err := d.client.Get(&c, query, customerID)
 	if err != nil {	
 		if err == sql.ErrNoRows{
@@ -52,20 +50,16 @@ func (d CustomerRepositoryDB) FindByID(customerID string)(*Customer, *errs.AppEr
 func (d CustomerRepositoryDB) FindAll()([]Customer, error){
 
 	query := "select * from customers"
-
 	rows, err := d.client.Query(query)
 	if err != nil {
 		log.Println("error query data to customer table", err.Error())
 		return nil, err
 	} 
-
 	var customers [] Customer
 	for rows.Next(){
-
 		var c Customer
 		err := rows.Scan(&c.ID, &c.Name,&c.DateOfBirth, &c.City, &c.ZipCode, &c.ZipCode)
 		if err!= nil{
-
 			if err == sql.ErrNoRows{
 				log.Println("error customer data not found", err.Error())
 				return nil, errors.New("customer data not found")
@@ -73,7 +67,6 @@ func (d CustomerRepositoryDB) FindAll()([]Customer, error){
 				log.Println("error scanning customer data", err.Error())
 				return nil, err
 			}
-				
 		}
 		customers = append(customers, c)
 	}

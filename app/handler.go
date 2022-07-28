@@ -154,3 +154,9 @@ func (ch *CustomerHendler)getCustomerByID(w http.ResponseWriter, r *http.Request
 // 		}
 // 	}
 
+
+
+// git checkout -b assigment
+//git add
+// git commit
+//git push -u origin assigment
