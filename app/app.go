@@ -10,14 +10,15 @@ import (
 )
 
 func Start() {
+	// * wiring
+	ch := CustomerHandler{service.NewCustomerService(domain.NewCustomerRepositoryDB())}
+
 	// * create ServeRoute
 	mux := mux.NewRouter()
 
-	// * defining routes// * wiring
-	ch := CustomerHandler{service.NewCustomerService(domain.NewCustomerRepositoryStub())}
+	mux.HandleFunc("/customers", ch.getAllCustomers).Methods("GET")
 
-	mux.HandleFunc("/customers", ch.getAllCustomers).Methods(http.MethodGet)
-
+	mux.HandleFunc("/customers/{customer_id:[0-9]+}", ch.getCustomerByID).Methods(http.MethodGet)
 
 	// * starting the server
 	fmt.Println("starting the server localhost:9000")
