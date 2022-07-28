@@ -7,17 +7,18 @@ import (
 	"errors"
 	"log"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq" //go get nama import ketika nama import error
 )
 
 type CustomerRepositoryDB struct{
-	client *sql.DB
+	client *sqlx.DB
 }
 
 func NewCustomerRepositoryDB()CustomerRepositoryDB{
 	// connStr := "user=pqgotest dbname=pqgotest sslmode=verify-full"
 	connStr := "postgres://postgres:fitri123@localhost/banking?sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
+	db, err := sqlx.Open("postgres", connStr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,11 +28,13 @@ func NewCustomerRepositoryDB()CustomerRepositoryDB{
 func (d CustomerRepositoryDB) FindByID(customerID string)(*Customer, *errs.AppErr){
 	query := "select * from customers where customer_id = $1"
 
-	row := d.client.QueryRow(query, customerID)
+	// row := d.client.QueryRow(query, customerID)
+	// err := row.Scan(&c.ID, &c.Name,&c.DateOfBirth, &c.City, &c.ZipCode, &c.Status)
 
 	var c Customer
-		err := row.Scan(&c.ID, &c.Name,&c.DateOfBirth, &c.City, &c.ZipCode, &c.Status)
-		if err != nil {
+
+	err := d.client.Get(&c, query, customerID)
+	if err != nil {	
 		if err == sql.ErrNoRows{
 			logger.Error("error customer data not found"+ err.Error())
 			return nil, errs.NewNotFoundError("customer data not found")
