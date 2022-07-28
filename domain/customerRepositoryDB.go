@@ -6,18 +6,19 @@ import (
 	"database/sql"
 	"log"
 
+	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 )
 
 type CustomerRepositoryDB struct {
-	client *sql.DB
+	client *sqlx.DB
 }
 
 func NewCustomerRepositoryDB() CustomerRepositoryDB {
 	connStr := "user=postgres password=d dbname=banking sslmode=disable"
-	db, err := sql.Open("postgres", connStr)
+	db, err := sqlx.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal("Database mu ", err)
+		log.Fatal("Your Database->  ", err)
 	}
 
 	return CustomerRepositoryDB{db}
@@ -26,10 +27,11 @@ func NewCustomerRepositoryDB() CustomerRepositoryDB {
 func (d CustomerRepositoryDB) FindByID(customerID string) (*Customer, *errs.AppErr) {
 	query := "select * from customers where customer_id = $1"
 
-	row := d.client.QueryRow(query, customerID)
+	// row := d.client.QueryRow(query, customerID)
 
 	var c Customer
-	err := row.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.ZipCode, &c.Status)
+	err := d.client.Get(&c, query, customerID)
+	// err := row.Scan(&c.ID, &c.Name, &c.DateOfBirth, &c.City, &c.ZipCode, &c.Status)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			logger.Error("error customer data not found "+ err.Error())

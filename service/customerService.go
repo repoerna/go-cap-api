@@ -2,12 +2,13 @@ package service
 
 import (
 	"capi/domain"
+	"capi/dto"
 	"capi/errs"
 )
 
 type CustomerService interface {
 	GetAllCustomers() ([]domain.Customer, error)
-	GetCustomerByID(string) (*domain.Customer, *errs.AppErr)
+	GetCustomerByID(string) (*dto.CustomerResponse, *errs.AppErr)
 }
 
 type DefaultCustomerService struct {
@@ -15,13 +16,19 @@ type DefaultCustomerService struct {
 }
 
 func (s DefaultCustomerService) GetAllCustomers() ([]domain.Customer, error) {
-	// * add process here
-	
+	// * add process here	
 	return s.repository.FindAll()
 }
 
-func (s DefaultCustomerService) GetCustomerByID(CustomerID string) (*domain.Customer, *errs.AppErr) {
-	return s.repository.FindByID(CustomerID)
+func (s DefaultCustomerService) GetCustomerByID(CustomerID string) (*dto.CustomerResponse, *errs.AppErr) {
+	cust, err := s.repository.FindByID(CustomerID)
+	if err != nil {
+		return nil, err
+	}
+
+	response := cust.ToDTO()
+
+	return &response, nil
 }
 
 func NewCustomerService(repository domain.CustomerRepository) DefaultCustomerService {
