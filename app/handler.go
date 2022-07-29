@@ -3,7 +3,6 @@ package app
 import (
 	"capi/service"
 	"encoding/json"
-	"encoding/xml"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -33,16 +32,16 @@ type CustomerHendler struct{
 func (ch *CustomerHendler)getAllCustomers(w http.ResponseWriter, r *http.Request) {
 	// fmt.Fprint(w, "get customer endpoint")
 
-	customers,_ := ch.service.GetAllCustomer()
+	status := r.URL.Query().Get("status")
 
-	if r.Header.Get("Content-Type") == "application/xml" {
-		w.Header().Add("Content-Type", "application/xml")
-		xml.NewEncoder(w).Encode(customers)
-	} else {
-		w.Header().Add("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(customers)
+	customers, err := ch.service.GetAllCustomer(status)
+	if err != nil {
+		writeResponse(w, err.Code, err.AsMessage())
+		return
 	}
-}
+	writeResponse(w, http.StatusOK, customers)
+	}
+
 
 
 func (ch *CustomerHendler)getCustomerByID(w http.ResponseWriter, r *http.Request) {
