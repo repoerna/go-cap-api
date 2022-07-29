@@ -4,7 +4,6 @@ import (
 	"capi/errs"
 	"capi/logger"
 	"database/sql"
-	"errors"
 	"log"
 
 	"github.com/jmoiron/sqlx"
@@ -14,6 +13,7 @@ import (
 type CustomerRepositoryDB struct{
 	client *sqlx.DB
 }
+
 
 func NewCustomerRepositoryDB()CustomerRepositoryDB{
 	// connStr := "user=pqgotest dbname=pqgotest sslmode=verify-full"
@@ -45,30 +45,32 @@ func (d CustomerRepositoryDB) FindByID(customerID string)(*Customer, *errs.AppEr
 	}
 		
 
-
-
-func (d CustomerRepositoryDB) FindAll()([]Customer, error){
-
+	
+func (d CustomerRepositoryDB) FindAll(status string)([]Customer, *errs.AppErr){
 	query := "select * from customers"
-	rows, err := d.client.Query(query)
-	if err != nil {
-		log.Println("error query data to customer table", err.Error())
-		return nil, err
-	} 
-	var customers [] Customer
-	for rows.Next(){
-		var c Customer
-		err := rows.Scan(&c.ID, &c.Name,&c.DateOfBirth, &c.City, &c.ZipCode, &c.ZipCode)
+	var customers []Customer
+
+	if status == "" {
+		query = "select * from customers"
+		err := d.client.Select(&customers, query)
 		if err!= nil{
-			if err == sql.ErrNoRows{
-				log.Println("error customer data not found", err.Error())
-				return nil, errors.New("customer data not found")
-			}else{
-				log.Println("error scanning customer data", err.Error())
-				return nil, err
+				log.Println("error scanning customer data"+ err.Error())
+				return nil, errs.NewUnexpectedError("unexpected database error")
+			}	
+	}else if status == "active" || status == "inactive"{
+		if status == "active" {
+			status = "1"
+			}else {
+			status = "0"
 			}
-		}
-		customers = append(customers, c)
+
+		query = "select * from customers where status = $1"
+		err := d.client.Select(&customers, query, status)
+		if err!= nil{
+				log.Println("error scanning customer data"+ err.Error())
+				return nil, errs.NewUnexpectedError("unexpected database error")
+		}	
 	}
 	return customers, nil
 }
+

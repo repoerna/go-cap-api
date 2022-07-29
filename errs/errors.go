@@ -24,6 +24,6 @@ func NewUnexpectedError(message string) *AppErr {
 	return &AppErr{
 		Code: http.StatusInternalServerError,
 		Message: message,
-	}
+	}	
 }
 
