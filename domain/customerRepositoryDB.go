@@ -14,7 +14,7 @@ type CustomerRepositoryDB struct {
 	client *sqlx.DB
 }
 
-func NewCustomerRepositoryDB() CustomerRepositoryDB {
+func NewCustomerRepositoryDB(client *sqlx.DB) CustomerRepositoryDB {
 	connStr := "user=postgres password=d dbname=banking sslmode=disable"
 	db, err := sqlx.Open("postgres", connStr)
 	if err != nil {
