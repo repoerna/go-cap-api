@@ -49,3 +49,10 @@ func NewAuthenticationError(message string) *AppErr {
 		Code:    http.StatusUnauthorized,
 	}
 }
+
+func NewForbiddenError(message string) *AppErr {
+	return &AppErr{
+		Message: message,
+		Code:    http.StatusForbidden,
+	}
+}

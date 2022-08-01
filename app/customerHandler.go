@@ -1,6 +1,7 @@
 package app
 
 import (
+	"capi/logger"
 	"capi/service"
 	"encoding/json"
 	"net/http"
@@ -31,6 +32,7 @@ func (ch *CustomerHandlers) getCustomerByID(w http.ResponseWriter, r *http.Reque
 	vars := mux.Vars(r)
 
 	customerID := vars["customer_id"]
+	logger.Info(customerID)
 
 	customer, err := ch.service.GetCustomerByID(customerID)
 	if err != nil {
