@@ -1,8 +1,10 @@
 package app
 
 import (
+	"capi/logger"
 	"capi/service"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -29,6 +31,8 @@ func (ch *CustomerHandlers) getAllCustomers(w http.ResponseWriter, r *http.Reque
 }
 
 func (ch *CustomerHandlers) getCustomerByID(w http.ResponseWriter, r *http.Request) {
+	claims := r.Context().Value(userInfo)
+	logger.Info(fmt.Sprintf("claims: %v", claims))
 	vars := mux.Vars(r)
 
 	customerID := vars["customer_id"]
