@@ -6,6 +6,7 @@ import (
 	"capi/errs"
 )
 
+// go:generate mockgen -destination=../mocks/service/mockCustomerService.go -package=service capi/service CustomerService
 type CustomerService interface {
 	GetAllCustomer(string) ([]dto.CustomerResponse, *errs.AppErr)
 	GetCustomerByID(string) (*dto.CustomerResponse, *errs.AppErr)

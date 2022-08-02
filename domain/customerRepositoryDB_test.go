@@ -2,6 +2,7 @@ package domain
 
 import (
 	"capi/errs"
+	"errors"
 	"log"
 	"reflect"
 	"testing"
@@ -69,10 +70,10 @@ func TestCustomerRepositoryDB_FindAll(t *testing.T) {
 			db, mock := NewMock()
 			repo := NewCustomerRepositoryDB(db)
 
-			rows := mock.NewRows([]string{"customer_id", "name", "city", "zip_code", "date_of_birth", "status"}).AddRow(
+			rows := mock.NewRows([]string{"customer_id", "name", "city", "zipcode", "date_of_birth", "status"}).AddRow(
 				"1", "User1", "Jakarta", "12345", "2022-01-01", "1").AddRow("2", "User2", "Surabaya", "67890", "2022-01-01", "1")
 
-			mock.ExpectQuery("select * from customers").WillReturnRows(rows)
+			mock.ExpectQuery(`select \* from customers`).WillReturnRows(rows)
 			got, got1 := repo.FindAll(tt.args.status)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CustomerRepositoryDB.FindAll() got = %v, want %v", got, tt.want)
@@ -82,6 +83,44 @@ func TestCustomerRepositoryDB_FindAll(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCustomerRepositoryDB_FindAll_should_return_error(t *testing.T) {
+	type args struct {
+		status string
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    []Customer
+		wantErr *errs.AppErr
+	}{
+		// TODO: Add test cases.
+		{
+			"succcess get data all customer",
+			args{""},
+			nil,
+			errs.NewUnexpectedError("unexpected database error"),
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			db, mock := NewMock()
+			repo := NewCustomerRepositoryDB(db)
+
+			mock.ExpectQuery(`select \* from customers`).WillReturnError(errors.New(""))
+			got, got1 := repo.FindAll(tt.args.status)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("CustomerRepositoryDB.FindAll() got = %v, want %v", got, tt.want)
+			}
+			if !reflect.DeepEqual(got1, tt.wantErr) {
+				t.Errorf("CustomerRepositoryDB.FindAll() got1 = %v, want %v", got1, tt.wantErr)
+			}
+		})
+	}
+
 }
 
 func TestCustomerRepositoryDB_FindByID(t *testing.T) {
